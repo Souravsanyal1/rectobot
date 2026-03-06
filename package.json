@@ -1,0 +1,15 @@
+{
+    "name": "tg-reaction-bot",
+    "version": "1.0.0",
+    "description": "Telegram bot for multiple reactions in real-time",
+    "main": "bot.js",
+    "type": "module",
+    "scripts": {
+        "start": "node bot.js"
+    },
+    "dependencies": {
+        "dotenv": "^16.4.1",
+        "grammy": "^1.20.2",
+        "mongodb": "^7.1.0"
+    }
+}
