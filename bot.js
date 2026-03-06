@@ -176,13 +176,16 @@ bot.on(["message", "channel_post"], async (ctx) => {
     }
 
     try {
-        await ctx.react("❤️");
-        console.log(`✅ Reacted with ❤️ in ${ctx.chat.type} (${ctx.chat.id})`);
+        // Multiple reactions: 👍 ❤️ 🔥 😂 😮 😢
+        const reactions = ["👍", "❤️", "🔥", "😂", "😮", "😢"];
+        const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
+        await ctx.react(randomReaction);
+        console.log(`✅ Reacted with ${randomReaction} in ${ctx.chat.type} (${ctx.chat.id})`);
     } catch (error) {
         if (error.description && error.description.includes("admin")) {
             console.log(`⚠️ Admin/Permission problem in ${ctx.chat.id}`);
         } else if (error.description && error.description.includes("REACTION_INVALID")) {
-            console.log(`❌ Reaction '❤️' not allowed in ${ctx.chat.id}`);
+            console.log(`❌ Reaction not allowed in ${ctx.chat.id}`);
         } else {
             console.error(`❌ Error in ${ctx.chat.id}: ${error.message}`);
         }
