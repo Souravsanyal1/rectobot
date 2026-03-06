@@ -1,6 +1,7 @@
 import { Bot, InlineKeyboard, session } from "grammy";
 import "dotenv/config";
 import fs from "fs";
+import http from "http";
 import { connectDB, saveChatDB, getAllChatsDB } from "./db.js";
 
 const bot = new Bot(process.env.BOT_TOKEN);
@@ -194,6 +195,15 @@ bot.on(["message", "channel_post"], async (ctx) => {
 
 // Start the bot
 const startBot = async () => {
+    // Basic HTTP server for Render health check
+    const PORT = process.env.PORT || 10000;
+    http.createServer((req, res) => {
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.end("Bot is running!\n");
+    }).listen(PORT, "0.0.0.0", () => {
+        console.log(`Server is listening on port ${PORT}`);
+    });
+
     const connected = await connectDB();
     if (!connected) return;
 
