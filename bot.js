@@ -172,23 +172,35 @@ bot.on("my_chat_member", (ctx) => {
 
 // Reaction logic (Group and Channel)
 bot.on(["message", "channel_post"], async (ctx) => {
+    // Basic chat type check
     if (ctx.chat.type !== "group" && ctx.chat.type !== "supergroup" && ctx.chat.type !== "channel") {
         return;
     }
 
+    // Skip service messages (like pinned messages, user joins, etc.) which don't support reactions
+    if (ctx.msg?.service || ctx.message?.service || ctx.channelPost?.service) {
+        return;
+    }
+
     try {
-        // Multiple reactions: 👍 ❤️ 🔥 😂 😮 😢
+        // Standard emojis that are usually enabled in all chats
         const reactions = ["👍", "❤️", "🔥", "😂", "😮", "😢"];
         const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
+        
         await ctx.react(randomReaction);
         console.log(`✅ Reacted with ${randomReaction} in ${ctx.chat.type} (${ctx.chat.id})`);
     } catch (error) {
-        if (error.description && error.description.includes("admin")) {
-            console.log(`⚠️ Admin/Permission problem in ${ctx.chat.id}`);
-        } else if (error.description && error.description.includes("REACTION_INVALID")) {
-            console.log(`❌ Reaction not allowed in ${ctx.chat.id}`);
+        const errorMsg = error.message || "";
+        const description = error.description || "";
+
+        if (description.includes("admin") || errorMsg.includes("admin")) {
+            console.error(`⚠️ Permission problem in ${ctx.chat.id}: Bot needs 'Post' and 'Edit' admin rights.`);
+        } else if (description.includes("REACTION_INVALID") || errorMsg.includes("REACTION_INVALID")) {
+            console.error(`❌ Reaction not allowed/custom emojis only in ${ctx.chat.id}`);
+        } else if (description.includes("BOT_METHOD_INVALID") || errorMsg.includes("BOT_METHOD_INVALID")) {
+            console.error(`❌ BOT_METHOD_INVALID in ${ctx.chat.id}: This usually means the bot is not an admin with 'Post Messages' permission in this channel.`);
         } else {
-            console.error(`❌ Error in ${ctx.chat.id}: ${error.message}`);
+            console.error(`❌ Error in ${ctx.chat.id}: ${errorMsg} - ${description}`);
         }
     }
 });
